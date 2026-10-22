@@ -1,0 +1,229 @@
+// prisma/schema.prisma
+generator client {
+  provider = "prisma-client-js"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  HR_MANAGER
+  EMPLOYEE
+}
+
+enum EmploymentStatus {
+  ACTIVE
+  INACTIVE
+  TERMINATED
+}
+
+enum LeaveType {
+  ANNUAL
+  SICK
+  MATERNITY
+  PATERNITY
+  UNPAID
+  OTHER
+}
+
+enum LeaveStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELLED
+}
+
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  LATE
+  HALF_DAY
+  ON_LEAVE
+}
+
+enum ConversationType {
+  PRIVATE          // employee ↔ employee
+  DEPARTMENT       // employee → department or department → department
+  DEPARTMENT_TO_EMPLOYEE
+}
+
+model User {
+  id                String           @id @default(auto()) @map("_id") @db.ObjectId
+  email             String           @unique
+  password          String
+  fullName          String
+  phone             String?
+  role              Role             @default(EMPLOYEE)
+  position          String?
+  employmentStatus  EmploymentStatus @default(ACTIVE)
+  dateJoined        DateTime         @default(now())
+  profileImage      String?
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+
+  // Relations
+  departmentId      String?          @db.ObjectId
+  department        Department?      @relation("EmployeeDepartment", fields: [departmentId], references: [id])
+
+  // Department head relation (the other side of the cycle)
+  headedDepartments Department[]     @relation("DepartmentHead")
+
+  // Attendance & Leave
+  attendances       Attendance[]
+  leaveRequests     LeaveRequest[]   @relation("LeaveRequester")
+  reviewedLeaves    LeaveRequest[]   @relation("LeaveReviewer")
+
+  // Messaging
+  sentMessages      Message[]        @relation("MessageSender")
+  participations    ConversationParticipant[]
+
+  // Activity
+  activities        Activity[]
+
+  @@index([departmentId])
+  @@index([role])
+  @@index([employmentStatus])
+}
+
+model Department {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Hierarchy
+  parentId    String?  @db.ObjectId
+  parent      Department?  @relation("DepartmentHierarchy", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  children    Department[] @relation("DepartmentHierarchy")
+
+  // Head
+  headId      String?  @db.ObjectId
+  head        User?    @relation("DepartmentHead", fields: [headId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  // Employees
+  employees   User[]   @relation("EmployeeDepartment")
+
+  // Messaging
+  participations ConversationParticipant[]
+
+  @@index([parentId])
+  @@index([headId])
+}
+
+model Attendance {
+  id          String           @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String           @db.ObjectId
+  user        User             @relation(fields: [userId], references: [id])
+  date        DateTime         // store as start of day
+  clockIn     DateTime?
+  clockOut    DateTime?
+  status      AttendanceStatus @default(PRESENT)
+  notes       String?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  @@unique([userId, date])
+  @@index([userId])
+  @@index([date])
+}
+
+model LeaveRequest {
+  id          String      @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String      @db.ObjectId
+  user        User        @relation("LeaveRequester", fields: [userId], references: [id])
+  leaveType   LeaveType
+  startDate   DateTime
+  endDate     DateTime
+  reason      String
+  status      LeaveStatus @default(PENDING)
+  reviewedById String?    @db.ObjectId
+  reviewedBy  User?       @relation("LeaveReviewer", fields: [reviewedById], references: [id])
+  reviewNote  String?
+  reviewedAt  DateTime?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@index([userId])
+  @@index([status])
+  @@index([startDate, endDate])
+}
+
+model Conversation {
+  id          String             @id @default(auto()) @map("_id") @db.ObjectId
+  type        ConversationType
+  title       String?            // optional for department conversations
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+
+  participants ConversationParticipant[]
+  messages     Message[]
+}
+
+model ConversationParticipant {
+  id             String       @id @default(auto()) @map("_id") @db.ObjectId
+  conversationId String       @db.ObjectId
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+
+  // A participant is either a User OR a Department
+  userId         String?      @db.ObjectId
+  user           User?        @relation(fields: [userId], references: [id])
+  departmentId   String?      @db.ObjectId
+  department     Department?  @relation(fields: [departmentId], references: [id])
+
+  joinedAt       DateTime     @default(now())
+
+  @@unique([conversationId, userId])
+  @@unique([conversationId, departmentId])
+  @@index([userId])
+  @@index([departmentId])
+}
+
+model Message {
+  id             String       @id @default(auto()) @map("_id") @db.ObjectId
+  conversationId String       @db.ObjectId
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+  senderId       String       @db.ObjectId
+  sender         User         @relation("MessageSender", fields: [senderId], references: [id])
+  content        String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  attachments    Attachment[]
+
+  @@index([conversationId])
+  @@index([senderId])
+  @@index([createdAt])
+}
+
+model Attachment {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  messageId    String   @db.ObjectId
+  message      Message  @relation(fields: [messageId], references: [id])
+  originalName String
+  mimeType     String
+  size         Int
+  storageKey   String   // path/key in object storage (or local for now)
+  createdAt    DateTime @default(now())
+
+  @@index([messageId])
+}
+
+model Activity {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  actorId     String   @db.ObjectId
+  actor       User     @relation(fields: [actorId], references: [id])
+  action      String   // e.g. "EMPLOYEE_CREATED", "LEAVE_APPROVED"
+  entityType  String   // "User", "Department", "LeaveRequest"...
+  entityId    String?
+  metadata    Json?
+  createdAt   DateTime @default(now())
+
+  @@index([actorId])
+  @@index([createdAt])
+}
+
