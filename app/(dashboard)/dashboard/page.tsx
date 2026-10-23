@@ -16,13 +16,13 @@ export default async function DashboardPage() {
         totalDepartments: 0,
     };
 
-    let recentLeaves: { id: string; user: { fullName: string }; leaveType: string; startDate: Date; endDate: Date }[] = [];
+    let recentEmployees: { id: string; fullName: string; email: string; employmentStatus: EmploymentStatus }[] = [];
 
     if (isManager) {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
 
-        const [employees, present, pending, departments, leaves] = await Promise.all([
+        const [employees, present, pending, departments, leaves, recent] = await Promise.all([
             prisma.user.count({ where: { employmentStatus: EmploymentStatus.ACTIVE } }),
             prisma.attendance.count({
                 where: {
@@ -38,6 +38,11 @@ export default async function DashboardPage() {
                 orderBy: { createdAt: "desc" },
                 take: 5,
             }),
+            prisma.user.findMany({
+                orderBy: { createdAt: "desc" },
+                take: 5,
+                select: { id: true, fullName: true, email: true, employmentStatus: true },
+            }),
         ]);
 
         stats = {
@@ -47,6 +52,7 @@ export default async function DashboardPage() {
             totalDepartments: departments,
         };
         recentLeaves = leaves;
+        recentEmployees = recent;
     }
 
     return (
@@ -77,7 +83,19 @@ export default async function DashboardPage() {
                 </div>
             )}
 
-            {isManager && recentLeaves.length > 0 && (
+            {isManager && recentEmployees.length > 0 && (
+                <div className="rounded-2xl border border-slate-800 bg-slate-900/50 p-5">
+                    <h3 className="text-lg font-semibold mb-3">Recent employees</h3>
+                    <ul className="space-y-2">
+                        {recentEmployees.map((e) => (
+                            <li key={e.id} className="flex items-center justify-between text-sm">
+                                <span>{e.fullName}</span>
+                                <span className="text-slate-400">{e.email} · {e.employmentStatus}</span>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            )}
                 <div className="rounded-2xl border border-slate-800 bg-slate-900/50 p-5">
                     <h3 className="text-lg font-semibold mb-3">Pending leave requests</h3>
                     <ul className="space-y-2">
