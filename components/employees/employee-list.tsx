@@ -54,11 +54,7 @@ export function EmployeeList({
             onChange={(e) => onSearchChange(e.target.value)}
           />
         </div>
-        {canManage && (
-          <Link href="/employees/new">
-            <Button>+ New Employee</Button>
-          </Link>
-        )}
+        <div />
       </div>
 
       {employees.length === 0 ? (
