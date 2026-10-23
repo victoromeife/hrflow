@@ -63,14 +63,16 @@ export function MessagesClient({ user, conversations, users, departments }: Mess
 
   return (
     <div className="h-[calc(100vh-12rem)] flex border border-slate-800 rounded-xl overflow-hidden bg-slate-900/30">
-      <MessagesSidebar
-        conversations={conversations}
-        activeId={activeConvId}
-        onSelect={setActiveConvId}
-        onNewChat={() => setShowNewChat(true)}
-        getLabel={getConversationLabel}
-        getIcon={getConversationIcon}
-      />
+      <div className={`${activeConvId ? "hidden md:flex" : "flex"} flex-col`}>
+        <MessagesSidebar
+          conversations={conversations}
+          activeId={activeConvId}
+          onSelect={setActiveConvId}
+          onNewChat={() => setShowNewChat(true)}
+          getLabel={getConversationLabel}
+          getIcon={getConversationIcon}
+        />
+      </div>
 
       <div className="flex-1 flex flex-col min-w-0">
         {activeConversation ? (
