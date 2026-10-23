@@ -104,7 +104,7 @@ export async function cancelLeaveRequest(id: string): Promise<LeaveState> {
   const leave = await prisma.leaveRequest.findUnique({ where: { id } });
   if (!leave) return { error: "Leave request not found" };
   if (leave.userId !== user.id) return { error: "Not authorized" };
-  if (leave.status !== LeaveStatus.PENDING) return { error: "Only pending requests can be cancelled" });
+  if (leave.status !== LeaveStatus.PENDING) return { error: "Only pending requests can be cancelled" };
 
   await prisma.leaveRequest.update({
     where: { id },
