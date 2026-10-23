@@ -16,11 +16,13 @@ export default async function DashboardPage() {
         totalDepartments: 0,
     };
 
+    let recentLeaves: { id: string; user: { fullName: string }; leaveType: string; startDate: Date; endDate: Date }[] = [];
+
     if (isManager) {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
 
-        const [employees, present, pending, departments] = await Promise.all([
+        const [employees, present, pending, departments, leaves] = await Promise.all([
             prisma.user.count({ where: { employmentStatus: EmploymentStatus.ACTIVE } }),
             prisma.attendance.count({
                 where: {
@@ -30,6 +32,12 @@ export default async function DashboardPage() {
             }),
             prisma.leaveRequest.count({ where: { status: LeaveStatus.PENDING } }),
             prisma.department.count(),
+            prisma.leaveRequest.findMany({
+                where: { status: LeaveStatus.PENDING },
+                include: { user: { select: { fullName: true } } },
+                orderBy: { createdAt: "desc" },
+                take: 5,
+            }),
         ]);
 
         stats = {
@@ -38,6 +46,7 @@ export default async function DashboardPage() {
             pendingLeaves: pending,
             totalDepartments: departments,
         };
+        recentLeaves = leaves;
     }
 
     return (
@@ -65,6 +74,20 @@ export default async function DashboardPage() {
                     <p className="text-slate-300">
                         Welcome to HRFlow. Use the sidebar to clock in, request leave, or message your team.
                     </p>
+                </div>
+            )}
+
+            {isManager && recentLeaves.length > 0 && (
+                <div className="rounded-2xl border border-slate-800 bg-slate-900/50 p-5">
+                    <h3 className="text-lg font-semibold mb-3">Pending leave requests</h3>
+                    <ul className="space-y-2">
+                        {recentLeaves.map((l) => (
+                            <li key={l.id} className="flex items-center justify-between text-sm">
+                                <span>{l.user.fullName}</span>
+                                <span className="text-slate-400">{l.leaveType} · {new Date(l.startDate).toLocaleDateString()} – {new Date(l.endDate).toLocaleDateString()}</span>
+                            </li>
+                        ))}
+                    </ul>
                 </div>
             )}
         </div>
