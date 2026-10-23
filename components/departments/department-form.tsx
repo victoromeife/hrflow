@@ -10,12 +10,12 @@ import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { FormField } from "@/components/ui/form-field";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import type { Department } from "@/app/generated/prisma";
+import { useActionState } from "react";
 
 interface DepartmentFormProps {
   departments: { id: string; name: string }[];
   employees: { id: string; fullName: string; email: string }[];
-  action: (formData: FormData) => Promise<{ error?: string; success?: string }>;
+  action: (prevState: any, formData: FormData) => Promise<{ error?: string; success?: string }>;
   submitLabel: string;
   defaultValues?: Partial<DepartmentInput> & { id?: string };
   onCancel?: () => void;
@@ -32,12 +32,15 @@ export function DepartmentForm({ departments, employees, action, submitLabel, de
     defaultValues,
   });
 
-  const [serverError, setServerError] = React.useState<string | null>(null);
-  const [serverSuccess, setServerSuccess] = React.useState<string | null>(null);
+  const [state, formAction] = useActionState(action, {});
 
-  const onSubmit = async (data: DepartmentInput) => {
-    setServerError(null);
-    setServerSuccess(null);
+  React.useEffect(() => {
+    if (state?.success) {
+      reset();
+    }
+  }, [state?.success, reset]);
+
+  const onSubmit = (data: DepartmentInput) => {
     const fd = new FormData();
     fd.append("name", data.name);
     if (data.description) fd.append("description", data.description);
@@ -45,13 +48,7 @@ export function DepartmentForm({ departments, employees, action, submitLabel, de
     if (data.headId) fd.append("headId", data.headId);
     if (defaultValues?.id) fd.append("id", defaultValues.id);
 
-    const result = await action(fd);
-    if (result?.error) {
-      setServerError(result.error);
-    } else if (result?.success) {
-      setServerSuccess(result.success);
-      reset();
-    }
+    formAction(fd);
   };
 
   return (
@@ -88,16 +85,32 @@ export function DepartmentForm({ departments, employees, action, submitLabel, de
             </FormField>
           </div>
 
-          {serverError && (
+          {state?.error && (
             <div className="text-sm text-red-400 bg-red-600/10 border border-red-600/30 rounded-lg px-4 py-3">
-              {serverError}
+              {state.error}
             </div>
           )}
-          {serverSuccess && (
+          {state?.success && (
             <div className="text-sm text-emerald-300 bg-emerald-600/10 border border-emerald-600/30 rounded-lg px-4 py-3">
-              {serverSuccess}
+              {state.success}
             </div>
           )}
+
+          <div className="flex justify-end gap-3 pt-2">
+            {onCancel && (
+              <Button type="button" variant="outline" onClick={onCancel}>
+                Cancel
+              </Button>
+            )}
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? "Saving..." : submitLabel}
+            </Button>
+          </div>
+        </form>
+      </CardContent>
+    </Card>
+  );
+}
 
           <div className="flex justify-end gap-3 pt-2">
             {onCancel && (

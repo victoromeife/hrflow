@@ -15,7 +15,7 @@ export type MessageState = {
 };
 
 export async function sendMessage(
-  _prev: MessageState,
+  _prev: MessageState = {},
   formData: FormData
 ): Promise<MessageState> {
   const user = await requireAuth();

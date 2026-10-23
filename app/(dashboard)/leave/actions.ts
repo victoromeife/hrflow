@@ -16,7 +16,7 @@ export type LeaveState = {
 };
 
 export async function createLeaveRequest(
-  _prev: LeaveState,
+  _prev: LeaveState = {},
   formData: FormData
 ): Promise<LeaveState> {
   const user = await requireAuth();

@@ -16,7 +16,7 @@ export type DepartmentState = {
 };
 
 export async function createDepartment(
-  _prev: DepartmentState,
+  _prev: DepartmentState = {},
   formData: FormData
 ): Promise<DepartmentState> {
   const user = await requireAuth();
@@ -31,11 +31,6 @@ export async function createDepartment(
 
   const parsed = departmentSchema.safeParse(raw);
   if (!parsed.success) return { error: parsed.error.issues[0].message };
-
-  // Prevent self-parenting
-  if (parsed.data.parentId && parsed.data.parentId === parsed.data.headId) {
-    // allowed - head can be in sub-dept, but parent check separate
-  }
 
   // Validate head is active employee
   if (parsed.data.headId) {
@@ -74,7 +69,7 @@ export async function createDepartment(
 }
 
 export async function updateDepartment(
-  _prev: DepartmentState,
+  _prev: DepartmentState = {},
   formData: FormData
 ): Promise<DepartmentState> {
   const user = await requireAuth();

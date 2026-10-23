@@ -5,45 +5,33 @@ import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { sendMessage } from "@/app/(dashboard)/messages/actions";
+import { useActionState } from "react";
 
 interface MessageComposerProps {
   conversationId: string;
   currentUserId: string;
 }
 
-export function MessageComposer({ conversationId, currentUserId }: MessageComposerProps) {
-  const [content, setContent] = React.useState("");
-  const [sending, setSending] = React.useState(false);
-  const [error, setError] = React.useState<string | null>(null);
+export function MessageComposer({ conversationId }: MessageComposerProps) {
+  const [state, formAction, pending] = useActionState(sendMessage, {});
+  const formRef = React.useRef<HTMLFormElement>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!content.trim()) return;
-    setSending(true);
-    setError(null);
-    const fd = new FormData();
-    fd.append("conversationId", conversationId);
-    fd.append("content", content.trim());
-    const res = await sendMessage(fd);
-    if (res?.error) {
-      setError(res.error);
+  React.useEffect(() => {
+    if (state?.success && formRef.current) {
+      formRef.current.reset();
     }
-    setContent("");
-    setSending(false);
-  };
+  }, [state?.success]);
 
   return (
-    <form onSubmit={handleSubmit} className="border-t border-slate-800 p-4 flex items-center gap-2">
-      <Input
-        placeholder="Type a message..."
-        value={content}
-        onChange={(e) => setContent(e.target.value)}
-        className="flex-1"
-      />
-      <Button type="submit" disabled={sending || !content.trim()}>
-        {sending ? "..." : "Send"}
-      </Button>
-      {error && <p className="text-xs text-red-400 w-full">{error}</p>}
+    <form ref={formRef} action={formAction} className="border-t border-slate-800 p-4 flex flex-col gap-2">
+      <input type="hidden" name="conversationId" value={conversationId} />
+      <div className="flex items-center gap-2">
+        <Input name="content" placeholder="Type a message..." className="flex-1" required />
+        <Button type="submit" disabled={pending}>
+          {pending ? "..." : "Send"}
+        </Button>
+      </div>
+      {state?.error && <p className="text-xs text-red-400">{state.error}</p>}
     </form>
   );
 }

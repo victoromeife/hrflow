@@ -17,7 +17,7 @@ export type EmployeeState = {
 };
 
 export async function createEmployee(
-  _prev: EmployeeState,
+  _prev: EmployeeState = {},
   formData: FormData
 ): Promise<EmployeeState> {
   const user = await requireAuth();
@@ -66,7 +66,7 @@ export async function createEmployee(
 }
 
 export async function updateEmployee(
-  _prev: EmployeeState,
+  _prev: EmployeeState = {},
   formData: FormData
 ): Promise<EmployeeState> {
   const user = await requireAuth();
