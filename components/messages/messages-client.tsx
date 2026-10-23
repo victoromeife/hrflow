@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { MessagesSidebar } from "./messages-sidebar";
 import { MessageView } from "./message-view";
 import { MessageComposer } from "./message-composer";
+import { NewChatModal } from "./new-chat-modal";
 import { UsersIcon, BuildingIcon, MessageSquareIcon } from "@/components/icons";
 import type { User, Conversation, Message, Department } from "@/app/generated/prisma";
 
