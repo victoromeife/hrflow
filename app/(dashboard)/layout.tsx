@@ -1,4 +1,5 @@
 // app/(dashboard)/layout.tsx
+export const dynamic = "force-dynamic";
 import { getCurrentUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { logoutAction } from "@/app/(auth)/actions";
