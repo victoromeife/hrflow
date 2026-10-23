@@ -1,4 +1,5 @@
 // app/(dashboard)/layout.tsx
+export const instant = false;
 import { getCurrentUser } from "@/lib/auth";
 import { connection } from "next/server";
 import { logoutAction } from "@/app/(auth)/actions";
@@ -20,7 +21,6 @@ export default async function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  await connection();
   const user = await getCurrentUser();
   if (!user) redirect("/login");
 
