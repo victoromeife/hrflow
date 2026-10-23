@@ -17,6 +17,7 @@ export default async function DashboardPage() {
     };
 
     let recentEmployees: { id: string; fullName: string; email: string; employmentStatus: EmploymentStatus }[] = [];
+    let recentLeaves: { id: string; user: { fullName: string }; leaveType: string; startDate: Date; endDate: Date }[] = [];
 
     if (isManager) {
         const today = new Date();
