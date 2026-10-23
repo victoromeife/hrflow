@@ -1,11 +1,12 @@
 // app/(dashboard)/layout.tsx
 export const instant = false;
 import { getCurrentUser } from "@/lib/auth";
-import { connection } from "next/server";
+
 import { logoutAction } from "@/app/(auth)/actions";
 import Link from "next/link";
 
 import { MobileNav } from "@/components/layout/mobile-nav";
+import { DashboardIcon, UsersIcon, BuildingIcon, ClockIcon, CalendarIcon, MessageSquareIcon } from "@/components/icons";
 
 const navItems = [
     { href: "/dashboard", label: "Dashboard", icon: <DashboardIcon className="w-5 h-5" /> },
