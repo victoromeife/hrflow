@@ -111,19 +111,3 @@ export function DepartmentForm({ departments, employees, action, submitLabel, de
     </Card>
   );
 }
-
-          <div className="flex justify-end gap-3 pt-2">
-            {onCancel && (
-              <Button type="button" variant="outline" onClick={onCancel}>
-                Cancel
-              </Button>
-            )}
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "Saving..." : submitLabel}
-            </Button>
-          </div>
-        </form>
-      </CardContent>
-    </Card>
-  );
-}
