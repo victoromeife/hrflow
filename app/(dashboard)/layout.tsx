@@ -1,6 +1,7 @@
 // app/(dashboard)/layout.tsx
 export const instant = false;
 import { getCurrentUser } from "@/lib/auth";
+import { redirect } from "next/navigation";
 
 import { logoutAction } from "@/app/(auth)/actions";
 import Link from "next/link";

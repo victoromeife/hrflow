@@ -19,7 +19,7 @@ const loginSchema = z.object({
     password: z.string().min(1, "Password is required"),
 });
 
-export async function registerAction(formData: FormData) {
+export async function registerAction(_prevState: any, formData: FormData) {
     const raw = {
         fullName: formData.get("fullName") as string,
         email: formData.get("email") as string,
@@ -67,7 +67,7 @@ export async function registerAction(formData: FormData) {
     redirect("/dashboard");
 }
 
-export async function loginAction(formData: FormData) {
+export async function loginAction(_prevState: any, formData: FormData) {
     const raw = {
         email: formData.get("email") as string,
         password: formData.get("password") as string,

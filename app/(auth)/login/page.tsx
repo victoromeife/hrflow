@@ -1,7 +1,11 @@
+"use client";
+
 import { loginAction } from "../actions";
 import Link from "next/link";
+import { useActionState } from "react";
 
 export default function LoginPage() {
+    const [state, formAction, pending] = useActionState(loginAction, { error: "" });
     return (
         <div className="min-h-screen flex bg-slate-950">
             {/* Left branding panel */}
@@ -39,7 +43,12 @@ export default function LoginPage() {
                         <p className="mt-2 text-slate-400">Sign in to your HRFlow account</p>
                     </div>
 
-                    <form action={loginAction} className="space-y-5">
+                    <form action={formAction} className="space-y-5">
+                        {state?.error && (
+                            <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+                                {state.error}
+                            </div>
+                        )}
                         <div>
                             <label htmlFor="email" className="block text-sm font-medium text-slate-300 mb-1.5">
                                 Email address
@@ -72,9 +81,10 @@ export default function LoginPage() {
 
                         <button
                             type="submit"
-                            className="w-full py-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold transition shadow-lg shadow-indigo-600/25"
+                            disabled={pending}
+                            className="w-full py-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-semibold transition shadow-lg shadow-indigo-600/25"
                         >
-                            Sign in
+                            {pending ? "Signing in..." : "Sign in"}
                         </button>
                     </form>
 

@@ -1,7 +1,11 @@
+"use client";
+
 import { registerAction } from "../actions";
 import Link from "next/link";
+import { useActionState } from "react";
 
 export default function RegisterPage() {
+    const [state, formAction, pending] = useActionState(registerAction, { error: "" });
     return (
         <div className="min-h-screen flex bg-slate-950">
             <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
@@ -32,7 +36,12 @@ export default function RegisterPage() {
                         <p className="mt-2 text-slate-400">Get started with HRFlow</p>
                     </div>
 
-                    <form action={registerAction} className="space-y-5">
+                    <form action={formAction} className="space-y-5">
+                        {state?.error && (
+                            <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+                                {state.error}
+                            </div>
+                        )}
                         <div>
                             <label htmlFor="fullName" className="block text-sm font-medium text-slate-300 mb-1.5">
                                 Full name
@@ -91,9 +100,10 @@ export default function RegisterPage() {
 
                         <button
                             type="submit"
-                            className="w-full py-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold transition shadow-lg shadow-indigo-600/25"
+                            disabled={pending}
+                            className="w-full py-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-semibold transition shadow-lg shadow-indigo-600/25"
                         >
-                            Create account
+                            {pending ? "Creating..." : "Create account"}
                         </button>
                     </form>
 
