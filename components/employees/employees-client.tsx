@@ -89,12 +89,6 @@ export function EmployeesClient({ employees, departments, canManage }: Employees
         onOpenChange={setShowCreate}
         title="Create Employee"
         description="Add a new employee to the organization."
-        footer={
-          <>
-            <Button variant="outline" onClick={() => setShowCreate(false)}>Cancel</Button>
-            <Button form="employee-create-form" type="submit">Create</Button>
-          </>
-        }
       >
         <EmployeeForm
           departments={departments}
