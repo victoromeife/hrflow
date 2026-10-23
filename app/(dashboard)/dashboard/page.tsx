@@ -96,8 +96,8 @@ export default async function DashboardPage() {
                     </ul>
                 </div>
             )}
+            {isManager && recentLeaves.length > 0 && (
                 <div className="rounded-2xl border border-slate-800 bg-slate-900/50 p-5">
-                    <h3 className="text-lg font-semibold mb-3">Pending leave requests</h3>
                     <ul className="space-y-2">
                         {recentLeaves.map((l) => (
                             <li key={l.id} className="flex items-center justify-between text-sm">
