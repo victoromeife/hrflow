@@ -37,7 +37,7 @@ export function MessagesSidebar({ conversations, activeId, onSelect, onNewChat, 
   const lastMessage = (conv: ConversationWithMessages) => conv.messages[0];
 
   return (
-    <div className="w-80 border-r border-slate-800 flex flex-col">
+    <div className="w-full md:w-80 border-r border-slate-800 flex flex-col">
       <div className="p-4 border-b border-slate-800">
         <Button className="w-full" onClick={onNewChat}>
           + New Conversation
