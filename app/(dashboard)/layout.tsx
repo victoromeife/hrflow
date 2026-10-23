@@ -5,7 +5,7 @@ import { connection } from "next/server";
 import { logoutAction } from "@/app/(auth)/actions";
 import Link from "next/link";
 
-import { DashboardIcon, UsersIcon, BuildingIcon, ClockIcon, CalendarIcon, MessageSquareIcon } from "@/components/icons";
+import { MobileNav } from "@/components/layout/mobile-nav";
 
 const navItems = [
     { href: "/dashboard", label: "Dashboard", icon: <DashboardIcon className="w-5 h-5" /> },
@@ -70,7 +70,10 @@ export default async function DashboardLayout({
 
       <div className="flex-1 flex flex-col min-w-0">
         <header className="h-14 border-b border-slate-800 flex items-center justify-between px-6 bg-slate-950/80 backdrop-blur sticky top-0 z-10">
-          <h1 className="text-sm font-medium text-slate-400">HR & Internal Communication</h1>
+          <div className="flex items-center gap-3">
+            <MobileNav />
+            <h1 className="text-sm font-medium text-slate-400">HR & Internal Communication</h1>
+          </div>
           <div className="md:hidden flex items-center gap-2">
             <span className="text-sm text-slate-300">{user.fullName}</span>
           </div>
