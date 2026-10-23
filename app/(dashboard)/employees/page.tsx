@@ -3,7 +3,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { canManageEmployees } from "@/lib/permissions";
 import { EmploymentStatus } from "@/app/generated/prisma";
-import { EmployeesClient } from "./clients";
+import { EmployeesClient } from "@/components/employees/employees-client";
 
 export default async function EmployeesPage() {
   const user = await getCurrentUser();

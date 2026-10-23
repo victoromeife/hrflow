@@ -4,13 +4,15 @@ import { redirect } from "next/navigation";
 import { logoutAction } from "@/app/(auth)/actions";
 import Link from "next/link";
 
+import { DashboardIcon, UsersIcon, BuildingIcon, ClockIcon, CalendarIcon, MessageSquareIcon } from "@/components/icons";
+
 const navItems = [
-  { href: "/dashboard", label: "Dashboard", icon: "▦" },
-  { href: "/employees", label: "Employees", icon: "👤" },
-  { href: "/departments", label: "Departments", icon: "🏢" },
-  { href: "/attendance", label: "Attendance", icon: "⏱" },
-  { href: "/leave", label: "Leave", icon: "📅" },
-  { href: "/messages", label: "Messages", icon: "💬" },
+    { href: "/dashboard", label: "Dashboard", icon: <DashboardIcon className="w-5 h-5" /> },
+    { href: "/employees", label: "Employees", icon: <UsersIcon className="w-5 h-5" /> },
+    { href: "/departments", label: "Departments", icon: <BuildingIcon className="w-5 h-5" /> },
+    { href: "/attendance", label: "Attendance", icon: <ClockIcon className="w-5 h-5" /> },
+    { href: "/leave", label: "Leave", icon: <CalendarIcon className="w-5 h-5" /> },
+    { href: "/messages", label: "Messages", icon: <MessageSquareIcon className="w-5 h-5" /> },
 ];
 
 export default async function DashboardLayout({
