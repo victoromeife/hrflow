@@ -55,12 +55,6 @@ export function DepartmentsClient({ departments, employees, canManage }: Departm
         onOpenChange={setShowCreate}
         title="Create Department"
         description="Add a new department to the organization hierarchy."
-        footer={
-          <>
-            <Button variant="outline" onClick={() => setShowCreate(false)}>Cancel</Button>
-            <Button form="dept-create-form" type="submit">Create</Button>
-          </>
-        }
       >
         <DepartmentForm
           departments={departments.map((d) => ({ id: d.id, name: d.name }))}
