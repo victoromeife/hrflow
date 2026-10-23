@@ -74,7 +74,7 @@ export function MessagesClient({ user, conversations, users, departments }: Mess
         />
       </div>
 
-      <div className="flex-1 flex flex-col min-w-0">
+       <div className={`${activeConvId ? "flex" : "hidden md:flex"} flex-1 flex-col min-w-0`}>
         {activeConversation ? (
           <>
             <div className="h-14 border-b border-slate-800 flex items-center px-5">
