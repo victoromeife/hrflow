@@ -121,12 +121,6 @@ export function LeaveClient({ user, requests, pendingCount, canApprove }: LeaveC
         onOpenChange={setShowRequest}
         title="Request Leave"
         description="Submit a new leave request for approval."
-        footer={
-          <>
-            <Button variant="outline" onClick={() => setShowRequest(false)}>Cancel</Button>
-            <Button form="leave-request-form" type="submit">Submit</Button>
-          </>
-        }
       >
         <LeaveForm action={createLeaveRequest} submitLabel="Submit Request" onCancel={() => setShowRequest(false)} />
       </Modal>
